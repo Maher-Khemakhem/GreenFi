@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GreenFi DApp</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>GreenFi DApp</h1>
+
+    <!-- Connect / Disconnect -->
+    <button id="connectButton">Connect Wallet</button>
+    <button id="disconnectButton">Disconnect Wallet</button>
+    <div id="walletAddress"></div>
+
+    <hr>
+
+    <h2>Create Project</h2>
+    <button id="createProjectButton" disabled>Create Project</button>
+    <div id="createStatus"></div>
+
+    <hr>
+
+    <h2>Stake ETH</h2>
+    <input type="number" id="stakeProjectId" placeholder="Project ID" disabled>
+    <input type="number" id="stakeAmount" placeholder="Amount in ETH" disabled>
+    <button id="stakeButton" disabled>Stake</button>
+    <div id="stakeStatus"></div>
+
+    <hr>
+
+    <h2>Withdraw Funds</h2>
+    <input type="number" id="withdrawProjectId" placeholder="Project ID" disabled>
+    <button id="withdrawButton" disabled>Withdraw</button>
+    <div id="withdrawStatus"></div>
+
+    <!-- Ethers v6 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.umd.min.js"></script>
+
+    <!-- Your app.js -->
+    <script src="app.js"></script>
+</body>
+</html>
