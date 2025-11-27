@@ -2,39 +2,225 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GreenFi DApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenFi - DeFi for Sustainable Finance</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>GreenFi DApp</h1>
+    <!-- Three.js Canvas Background -->
+    <canvas id="threejs-canvas" class="threejs-background"></canvas>
 
-    <!-- Connect / Disconnect -->
-    <button id="connectButton">Connect Wallet</button>
-    <button id="disconnectButton">Disconnect Wallet</button>
-    <div id="walletAddress"></div>
+    <!-- Content Overlay -->
+    <div class="content-overlay">
+        <!-- Header -->
+        <header class="header">
+            <div class="container header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+                            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>GreenFi</h1>
+                        <p>DeFi for Sustainable Finance</p>
+                    </div>
+                </div>
+                
+                <div class="wallet-section">
+                    <button id="connectButton" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+                            <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+                            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+                        </svg>
+                        Connect Wallet
+                    </button>
+                    <button id="disconnectButton" class="btn btn-danger" style="display: none;">
+                        Disconnect
+                    </button>
+                </div>
+            </div>
+            
+            <div id="walletAddress" class="wallet-info" style="display: none;">
+                <div class="container">
+                    <p>Connected: <span id="addressText" class="wallet-address"></span></p>
+                </div>
+            </div>
+        </header>
 
-    <hr>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Hero Section -->
+                <section class="hero">
+                    <h2>Invest in a Greener Future</h2>
+                    <p>Bridge DeFi with Environmental Impact. Track, verify, and grow sustainable projects on the blockchain.</p>
+                </section>
 
-    <h2>Create Project</h2>
-    <button id="createProjectButton" disabled>Create Project</button>
-    <div id="createStatus"></div>
+                <!-- Features Grid -->
+                <section class="features-grid">
+                    <div class="feature-card">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feature-icon">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+                        </svg>
+                        <h3>Verified Impact</h3>
+                        <p>Smart contract escrow</p>
+                    </div>
+                    <div class="feature-card">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feature-icon">
+                            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                            <polyline points="16 7 22 7 22 13"/>
+                        </svg>
+                        <h3>Financial Returns</h3>
+                        <p>Linked to ESG outcomes</p>
+                    </div>
+                    <div class="feature-card">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feature-icon">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                        <h3>Green Tokens</h3>
+                        <p>Tradeable impact units</p>
+                    </div>
+                    <div class="feature-card">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feature-icon">
+                            <path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"/>
+                        </svg>
+                        <h3>Transparent</h3>
+                        <p>On-chain accountability</p>
+                    </div>
+                </section>
 
-    <hr>
+                <!-- Status Messages -->
+                <div id="createStatus" class="status-container" style="display: none;"></div>
+                <div id="stakeStatus" class="status-container" style="display: none;"></div>
+                <div id="withdrawStatus" class="status-container" style="display: none;"></div>
 
-    <h2>Stake ETH</h2>
-    <input type="number" id="stakeProjectId" placeholder="Project ID" disabled>
-    <input type="number" id="stakeAmount" placeholder="Amount in ETH" disabled>
-    <button id="stakeButton" disabled>Stake</button>
-    <div id="stakeStatus"></div>
+                <!-- Action Cards -->
+                <section class="action-cards">
+                    <!-- Create Project -->
+                    <div class="action-card">
+                        <div class="card-header">
+                            <div class="card-icon blue">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"/>
+                                </svg>
+                            </div>
+                            <h3>Create Project</h3>
+                        </div>
+                        <p class="card-description">Launch a new sustainable project and receive a unique project ID.</p>
+                        <button id="createProjectButton" class="btn btn-blue" disabled>
+                            Create Project
+                        </button>
+                    </div>
 
-    <hr>
+                    <!-- Stake ETH -->
+                    <div class="action-card">
+                        <div class="card-header">
+                            <div class="card-icon green">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/>
+                                    <path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/>
+                                </svg>
+                            </div>
+                            <h3>Stake ETH</h3>
+                        </div>
+                        <p class="card-description">Invest in verified eco-projects and earn Green Tokens.</p>
+                        <div class="input-group">
+                            <input type="number" id="stakeProjectId" placeholder="Project ID" class="input-field" disabled>
+                            <input type="number" id="stakeAmount" placeholder="Amount (ETH)" class="input-field" step="0.01" disabled>
+                        </div>
+                        <button id="stakeButton" class="btn btn-green" disabled>
+                            Stake
+                        </button>
+                    </div>
 
-    <h2>Withdraw Funds</h2>
-    <input type="number" id="withdrawProjectId" placeholder="Project ID" disabled>
-    <button id="withdrawButton" disabled>Withdraw</button>
-    <div id="withdrawStatus"></div>
+                    <!-- Withdraw Funds -->
+                    <div class="action-card">
+                        <div class="card-header">
+                            <div class="card-icon purple">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+                                </svg>
+                            </div>
+                            <h3>Withdraw Funds</h3>
+                        </div>
+                        <p class="card-description">Project owners can withdraw after milestone verification.</p>
+                        <div class="input-group">
+                            <input type="number" id="withdrawProjectId" placeholder="Project ID" class="input-field" disabled>
+                        </div>
+                        <button id="withdrawButton" class="btn btn-purple" disabled>
+                            Withdraw
+                        </button>
+                    </div>
+                </section>
 
-    <!-- Ethers v6 -->
+                <!-- Impact Tracking -->
+                <section class="impact-tracking">
+                    <h3>Impact Tracking</h3>
+                    <div class="impact-grid">
+                        <div class="impact-item">
+                            <div class="impact-icon green">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="5"/>
+                                    <line x1="12" y1="1" x2="12" y2="3"/>
+                                    <line x1="12" y1="21" x2="12" y2="23"/>
+                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                                    <line x1="1" y1="12" x2="3" y2="12"/>
+                                    <line x1="21" y1="12" x2="23" y2="12"/>
+                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                                </svg>
+                            </div>
+                            <p class="impact-number">1,234</p>
+                            <p class="impact-label">Solar Panels Funded</p>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-icon blue">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"/>
+                                </svg>
+                            </div>
+                            <p class="impact-number">45,678</p>
+                            <p class="impact-label">Trees Planted</p>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-icon purple">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+                                </svg>
+                            </div>
+                            <p class="impact-number">892</p>
+                            <p class="impact-label">Tons CO₂ Offset</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>💚 GreenFi - Building a Sustainable Financial Future</p>
+                <p class="footer-subtitle">Powered by Ahmed Kallel & Maher Khemakhem • Verified by Smart Contracts</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Ethers.js v6 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.umd.min.js"></script>
 
     <!-- Your app.js -->
