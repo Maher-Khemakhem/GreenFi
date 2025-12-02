@@ -1,0 +1,552 @@
+  * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1a0a 0%, #0f2a0f 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #threejs-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 36px;
+            color: #00ff88;
+        }
+
+        .logo-text h1 {
+            font-size: 2em;
+            color: #00ff88;
+        }
+
+        .logo-text p {
+            font-size: 0.9em;
+            color: #88ffcc;
+        }
+
+        .back-btn {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 255, 136, 0.2);
+            transform: translateX(-5px);
+        }
+
+        /* Main Content */
+        .project-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 1024px) {
+            .project-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Project Header */
+        .project-header {
+            grid-column: 1 / -1;
+            background: rgba(0, 255, 136, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .project-category {
+            display: inline-block;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        .project-title {
+            font-size: 3em;
+            color: #ffffff;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .project-location {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #88ffcc;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .project-stats {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .project-stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            color: #00ff88;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            color: #88ffcc;
+            font-size: 0.9em;
+        }
+
+        /* Project Details */
+        .project-details {
+            background: rgba(0, 255, 136, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .section-title {
+            color: #00ff88;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .project-description {
+            color: #cccccc;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        /* Impact Metrics */
+        .impact-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .impact-card {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .impact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .impact-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #00ff88;
+        }
+
+        .impact-value {
+            font-size: 1.8em;
+            color: #00ff88;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .impact-label {
+            color: #88ffcc;
+            font-size: 0.9em;
+        }
+
+        /* Timeline */
+        .timeline {
+            margin: 40px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 50px;
+            width: 2px;
+            height: calc(100% + 30px);
+            background: rgba(0, 255, 136, 0.3);
+        }
+
+        .timeline-date {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 20px;
+            min-width: 120px;
+            text-align: center;
+            height: fit-content;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #00ff88;
+        }
+
+        .timeline-title {
+            color: #00ff88;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .timeline-description {
+            color: #cccccc;
+            line-height: 1.6;
+        }
+
+        /* Funding Section */
+        .funding-section {
+            background: rgba(0, 255, 136, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            height: fit-content;
+        }
+
+        .funding-progress {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc66);
+            border-radius: 10px;
+            width: 75%;
+            transition: width 1s ease;
+        }
+
+        .funding-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #88ffcc;
+            margin-bottom: 5px;
+        }
+
+        .funding-goal {
+            font-size: 2em;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .funding-time {
+            color: #ffa500;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Investment Form */
+        .investment-form {
+            background: rgba(0, 255, 136, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #88ffcc;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .eth-amount {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00ff88;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .quick-amounts {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quick-amount {
+            flex: 1;
+            padding: 10px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            color: #00ff88;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .quick-amount:hover {
+            background: rgba(0, 255, 136, 0.2);
+        }
+
+        .invest-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            color: #0a1a0a;
+            border: none;
+            padding: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .invest-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
+        }
+
+        .invest-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Investor List */
+        .investor-list {
+            background: rgba(0, 255, 136, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .investor-title {
+            color: #00ff88;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .investor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .investor-address {
+            font-family: monospace;
+            color: #00ff88;
+            font-size: 0.9em;
+        }
+
+        .investor-amount {
+            color: #88ffcc;
+            font-weight: bold;
+        }
+
+        /* Verification Badge */
+        .verification-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-top: 20px;
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .status-success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            display: block;
+        }
+
+        .status-error {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            color: #ff6666;
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #88ffcc;
+            border-top: 1px solid rgba(0, 255, 136, 0.1);
+            margin-top: 60px;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .project-title {
+                font-size: 2.2em;
+            }
+
+            .project-stats {
+                gap: 20px;
+            }
+
+            .stat-value {
+                font-size: 1.5em;
+            }
+
+            .project-header,
+            .project-details,
+            .funding-section {
+                padding: 25px;
+            }
+
+            .impact-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            .project-title {
+                font-size: 1.8em;
+            }
+
+            .section-title {
+                font-size: 1.5em;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+            }
+
+            .timeline-date {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .quick-amounts {
+                flex-direction: column;
+            }
+        }

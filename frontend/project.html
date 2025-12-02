@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details - GreenFi</title>
+    <link rel="stylesheet" href="project.css">
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0a1a0a 0%, #0f2a0f 100%);
+            margin: 5% auto;
+            padding: 40px;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 255, 136, 0.2);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .modal-header h2 {
+            color: #00ff88;
+            font-size: 1.8em;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #88ffcc;
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #00ff88;
+        }
+
+        .modal-body {
+            margin: 25px 0;
+        }
+
+        .modal-project-info {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .modal-project-name {
+            color: #ffffff;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .modal-project-stats {
+            display: flex;
+            gap: 20px;
+            color: #88ffcc;
+            font-size: 0.9em;
+        }
+
+        .modal-amount-input {
+            margin: 25px 0;
+        }
+
+        .modal-amount-label {
+            display: block;
+            color: #88ffcc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .modal-amount-wrapper {
+            position: relative;
+        }
+
+        .modal-amount-input-field {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1.3em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .modal-amount-input-field:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .modal-eth-symbol {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff88;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .modal-usd-conversion {
+            text-align: center;
+            color: #88ffcc;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .modal-quick-amounts {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .modal-quick-amount {
+            padding: 12px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 10px;
+            color: #00ff88;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .modal-quick-amount:hover {
+            background: rgba(0, 255, 136, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .modal-quick-amount.active {
+            background: rgba(0, 255, 136, 0.3);
+            border-color: #00ff88;
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.2);
+        }
+
+        .modal-balance-info {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .modal-balance-label {
+            color: #88ffcc;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .modal-balance-amount {
+            color: #00ff88;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .modal-status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            text-align: center;
+            font-size: 0.95em;
+        }
+
+        .modal-status.success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            display: block;
+        }
+
+        .modal-status.error {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            color: #ff6666;
+            display: block;
+        }
+
+        .modal-status.info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            display: block;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #cccccc;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-btn-cancel:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .modal-btn-confirm {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            color: #0a1a0a;
+            border: 1px solid #00ff88;
+        }
+
+        .modal-btn-confirm:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
+        }
+
+        .modal-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 255, 136, 0.3);
+            border-radius: 50%;
+            border-top-color: #00ff88;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 10% auto;
+                padding: 30px 25px;
+                width: 95%;
+            }
+
+            .modal-quick-amounts {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal-footer {
+                flex-direction: column;
+            }
+
+            .modal-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 25px 20px;
+            }
+
+            .modal-header h2 {
+                font-size: 1.5em;
+            }
+
+            .modal-amount-input-field {
+                padding: 15px;
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Three.js Background -->
+    <canvas id="threejs-canvas"></canvas>
+
+    <!-- Investment Modal -->
+    <div id="investmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirm Investment</h2>
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-project-info" id="modalProjectInfo">
+                    <div class="modal-project-name" id="modalProjectName">Project Name</div>
+                    <div class="modal-project-stats">
+                        <span>Current Funding: <span id="modalCurrentFunding">0%</span></span>
+                        <span>Goal: <span id="modalFundingGoal">0 ETH</span></span>
+                    </div>
+                </div>
+
+                <div class="modal-amount-input">
+                    <label class="modal-amount-label">Investment Amount (ETH)</label>
+                    <div class="modal-amount-wrapper">
+                        <input type="number" 
+                               id="modalInvestmentAmount" 
+                               class="modal-amount-input-field" 
+                               min="0.1" 
+                               max="100" 
+                               step="0.1" 
+                               value="1.0"
+                               placeholder="0.0">
+                        <span class="modal-eth-symbol">ETH</span>
+                    </div>
+                    <div class="modal-usd-conversion">
+                        ≈ $<span id="modalUsdAmount">0</span> USD
+                    </div>
+                </div>
+
+                <div class="modal-quick-amounts">
+                    <div class="modal-quick-amount" data-amount="0.1">0.1 ETH</div>
+                    <div class="modal-quick-amount" data-amount="0.5">0.5 ETH</div>
+                    <div class="modal-quick-amount" data-amount="1">1 ETH</div>
+                    <div class="modal-quick-amount" data-amount="5">5 ETH</div>
+                </div>
+
+                <div class="modal-balance-info">
+                    <div class="modal-balance-label">Your Wallet Balance</div>
+                    <div class="modal-balance-amount" id="modalWalletBalance">0 ETH</div>
+                </div>
+
+                <div class="modal-status" id="modalStatus"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" id="cancelInvestBtn">
+                    Cancel
+                </button>
+                <button class="modal-btn modal-btn-confirm" id="confirmInvestBtn">
+                    <span>💰</span> Confirm Investment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🌿</div>
+                <div class="logo-text">
+                    <h1>GreenFi</h1>
+                    <p>Decentralized Green Finance</p>
+                </div>
+            </div>
+            <a href="dashboard.html" class="back-btn">
+                ← Back to Dashboard
+            </a>
+        </header>
+
+        <!-- Project Header -->
+        <div class="project-header">
+            <span class="project-category" id="projectCategory">🌞 Renewable Energy</span>
+            <h1 class="project-title" id="projectTitle">Loading Project...</h1>
+            <div class="project-location">
+                <span>📍</span>
+                <span id="projectLocation">Loading...</span>
+            </div>
+            <div class="project-stats">
+                <div class="project-stat">
+                    <span class="stat-value" id="fundingPercentage">0%</span>
+                    <span class="stat-label">Funded</span>
+                </div>
+                <div class="project-stat">
+                    <span class="stat-value" id="investorCount">0</span>
+                    <span class="stat-label">Investors</span>
+                </div>
+                <div class="project-stat">
+                    <span class="stat-value">12%</span>
+                    <span class="stat-label">APY</span>
+                </div>
+                <div class="project-stat">
+                    <span class="stat-value" id="daysLeft">0</span>
+                    <span class="stat-label">Days Left</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="project-container">
+            <!-- Left Column: Project Details -->
+            <div class="project-details">
+                <h2 class="section-title">Project Overview</h2>
+                <p class="project-description" id="projectDescription">
+                    Loading project details...
+                </p>
+
+                <h2 class="section-title">Environmental Impact</h2>
+                <div class="impact-metrics">
+                    <div class="impact-card">
+                        <div class="impact-icon">🌍</div>
+                        <div class="impact-value" id="co2Reduction">0</div>
+                        <div class="impact-label">Tons CO2 Reduction/Yr</div>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-icon">⚡</div>
+                        <div class="impact-value" id="energyCapacity">0MW</div>
+                        <div class="impact-label">Clean Energy Capacity</div>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-icon">🏠</div>
+                        <div class="impact-value" id="householdsPowered">0</div>
+                        <div class="impact-label">Households Powered</div>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-icon">🌳</div>
+                        <div class="impact-value" id="treesEquivalent">0</div>
+                        <div class="impact-label">Equivalent Trees Planted</div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Project Timeline</h2>
+                <div class="timeline" id="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">Loading...</div>
+                        <div class="timeline-content">
+                            <h3 class="timeline-title">Loading timeline...</h3>
+                            <p class="timeline-description">Details will appear shortly.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="verification-badge">
+                    <span>✅</span>
+                    <span>Project Verified by GreenFi Auditors</span>
+                </div>
+            </div>
+
+            <!-- Right Column: Funding & Investment -->
+            <div class="funding-section">
+                <div class="funding-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="funding-stats">
+                        <span id="fundsRaised">0 ETH Raised</span>
+                        <span id="fundingGoal">0 ETH Goal</span>
+                    </div>
+                    <div class="funding-goal" id="fundingDisplay">
+                        0 / 0 ETH
+                    </div>
+                    <div class="funding-time">
+                        <span>⏰</span>
+                        <span id="fundingDeadline">Loading days remaining...</span>
+                    </div>
+                </div>
+
+                <!-- Investment Form -->
+                <div class="investment-form">
+                    <h3 class="section-title">Invest in This Project</h3>
+                    
+                    <div id="investmentStatus" class="status-message"></div>
+                    
+                    <!-- Milestone Status -->
+                    <div id="milestoneStatus" class="status-message" style="display: none; background: rgba(255, 215, 0, 0.1); border: 1px solid #FFD700; color: #FFD700;">
+                        🎉 Funding goal reached! Owner can now withdraw funds.
+                    </div>
+
+                    <!-- Owner Withdrawal Button -->
+                    <div id="ownerActions" style="display: none; margin-bottom: 20px;">
+                        <button id="withdrawButton" class="invest-btn" style="background: linear-gradient(135deg, #FFD700, #FFA500);">
+                            <span>💸</span> Withdraw Funds
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Investment Amount (ETH)</label>
+                        <input type="number" 
+                               id="investmentAmount" 
+                               class="form-input" 
+                               min="0.1" 
+                               max="100" 
+                               step="0.1" 
+                               value="1.0"
+                               placeholder="Enter ETH amount">
+                        <div class="eth-amount">
+                            <span>≈ $</span>
+                            <span id="usdAmount">0</span>
+                        </div>
+                        
+                        <div class="quick-amounts">
+                            <div class="quick-amount" data-amount="0.5">0.5 ETH</div>
+                            <div class="quick-amount" data-amount="1">1 ETH</div>
+                            <div class="quick-amount" data-amount="5">5 ETH</div>
+                            <div class="quick-amount" data-amount="10">10 ETH</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Estimated Annual Return</label>
+                        <div class="eth-amount">
+                            <span id="estimatedReturn">0 ETH</span>
+                            <span>(~12% APY)</span>
+                        </div>
+                    </div>
+
+                    <button id="investButton" class="invest-btn">
+                        <span>💰</span> Connect Wallet to Invest
+                    </button>
+
+                    <p style="color: #88ffcc; font-size: 0.9em; margin-top: 15px; text-align: center;">
+                        Minimum investment: 0.1 ETH
+                    </p>
+                </div>
+
+                <!-- Recent Investors -->
+                <div class="investor-list">
+                    <h3 class="investor-title">Recent Investors</h3>
+                    <div id="recentInvestors">
+                        <div class="investor-item">
+                            <span class="investor-address">Loading...</span>
+                            <span class="investor-amount">0 ETH</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>🌍 Investing in a sustainable future, one project at a time</p>
+            <p>Powered by Ethereum Smart Contracts • Transparent • Accountable • Green</p>
+        </footer>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.umd.min.js"></script>
+    
+    <!-- Project Page JavaScript -->
+    <script>
+        // Configuration
+        const BACKEND_URL = 'http://localhost:3000'; // Your backend URL
+        const CONTRACT_ADDRESS = '0xYourContractAddressHere'; // Your deployed contract address
+        const CONTRACT_ABI = [
+            // Add your contract ABI here
+            "function stake(uint256 projectId) external payable",
+            "function withdraw(uint256 projectId) external",
+            "function getProject(uint256 projectId) external view returns (address, string memory, uint256, uint256, bool)",
+            "function getStake(uint256 projectId, address staker) external view returns (uint256)"
+        ];
+
+        // Global state
+        let walletAddress = '';
+        let ethPrice = 1800;
+        let projectData = null;
+        let currentProjectId = null;
+        let provider = null;
+        let signer = null;
+        let contract = null;
+        let walletBalance = 0;
+
+        // Three.js Background Animation
+        let scene, camera, renderer, particlesMesh, globe;
+        
+        function initThreeJS() {
+            const canvas = document.getElementById('threejs-canvas');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a1a0a);
+            
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            // Green particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            const posArray = new Float32Array(particlesCount * 3);
+            
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 25;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.02,
+                color: 0x00ff88,
+                transparent: true,
+                opacity: 0.7
+            });
+            
+            particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            // Earth globe
+            const globeGeometry = new THREE.SphereGeometry(1.5, 32, 32);
+            const globeMaterial = new THREE.MeshPhongMaterial({
+                color: 0x22ff88,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.2
+            });
+            
+            globe = new THREE.Mesh(globeGeometry, globeMaterial);
+            scene.add(globe);
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const pointLight = new THREE.PointLight(0x00ff88, 1);
+            pointLight.position.set(5, 5, 5);
+            scene.add(pointLight);
+            
+            animate();
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (particlesMesh && globe) {
+                particlesMesh.rotation.y += 0.001;
+                particlesMesh.rotation.x += 0.0005;
+                
+                globe.rotation.y += 0.002;
+                globe.rotation.x += 0.001;
+                
+                // Floating animation
+                const positions = particlesMesh.geometry.attributes.position.array;
+                for (let i = 1; i < positions.length; i += 3) {
+                    positions[i] += Math.sin(Date.now() * 0.001 + i) * 0.001;
+                }
+                particlesMesh.geometry.attributes.position.needsUpdate = true;
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        async function initializePage() {
+            console.log('🌿 GreenFi Project Page Initializing...');
+            
+            // Get project ID from localStorage
+            currentProjectId = localStorage.getItem('greenfi_current_project');
+            
+            if (!currentProjectId) {
+                showStatus('No project selected. Redirecting to dashboard...', 'error');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+                return;
+            }
+            
+            console.log(`📋 Loading project ID: ${currentProjectId}`);
+            
+            // Initialize Three.js
+            initThreeJS();
+            
+            // Check wallet connection
+            await checkWalletConnection();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Setup modal
+            setupModal();
+            
+            // Fetch project data
+            await fetchProjectData();
+            
+            // Update ETH-USD conversion
+            await updateETHPrice();
+            
+            // Update estimated return
+            updateEstimatedReturn();
+            
+            // Start periodic updates
+            setInterval(fetchProjectData, 10000);
+            
+            console.log('✅ Project page ready');
+        }
+        
+        async function fetchProjectData() {
+            try {
+                console.log(`📡 Fetching project #${currentProjectId} data...`);
+                
+                const response = await fetch(`${BACKEND_URL}/api/projects/${currentProjectId}`);
+                const data = await response.json();
+                
+                if (data.success && data.project) {
+                    projectData = data.project;
+                    updateProjectUI(projectData);
+                    
+                    await fetchRecentStakes();
+                    await checkMilestoneStatus();
+                    updateOwnerFeatures();
+                } else {
+                    throw new Error('Project not found');
+                }
+            } catch (error) {
+                console.error('Error fetching project data:', error);
+                showStatus('Failed to load project data', 'error');
+            }
+        }
+        
+        function updateProjectUI(project) {
+            // Project header
+            document.getElementById('projectTitle').textContent = project.name || 'Project';
+            document.getElementById('projectDescription').textContent = project.description || 'No description available.';
+            
+            // Convert wei to ETH
+            const fundsInWei = BigInt(project.funds || '0');
+            const goalInWei = BigInt(project.Funding_Goal || '1');
+            
+            const fundsETH = Number(fundsInWei) / 1e18;
+            const goalETH = Number(goalInWei) / 1e18;
+            
+            // Calculate funding percentage
+            const percentage = goalETH > 0 ? (fundsETH / goalETH) * 100 : 0;
+            
+            // Update funding info
+            document.getElementById('fundingPercentage').textContent = `${Math.min(percentage, 100).toFixed(1)}%`;
+            document.getElementById('fundingDisplay').textContent = `${fundsETH.toFixed(2)} / ${goalETH.toFixed(2)} ETH`;
+            document.getElementById('fundsRaised').textContent = `${fundsETH.toFixed(2)} ETH Raised`;
+            document.getElementById('fundingGoal').textContent = `${goalETH.toFixed(2)} ETH Goal`;
+            
+            // Update progress bar
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = `${Math.min(percentage, 100)}%`;
+            
+            // Update investor count
+            document.getElementById('investorCount').textContent = project.staker_count || 0;
+            
+            // Calculate days left
+            const createdDate = project.created_at ? new Date(project.created_at) : new Date();
+            const deadline = new Date(createdDate);
+            deadline.setDate(deadline.getDate() + 180);
+            const daysLeft = Math.ceil((deadline - new Date()) / (1000 * 60 * 60 * 24));
+            document.getElementById('daysLeft').textContent = Math.max(daysLeft, 0);
+            
+            // Update environmental impact metrics
+            const scaleFactor = Math.min(percentage / 100, 1);
+            document.getElementById('co2Reduction').textContent = Math.round(25000 * scaleFactor).toLocaleString();
+            document.getElementById('energyCapacity').textContent = `${(50 * scaleFactor).toFixed(1)}MW`;
+            document.getElementById('householdsPowered').textContent = Math.round(15000 * scaleFactor).toLocaleString();
+            document.getElementById('treesEquivalent').textContent = Math.round(500000 * scaleFactor).toLocaleString();
+            
+            // Update funding deadline text
+            document.getElementById('fundingDeadline').textContent = `${Math.max(daysLeft, 0)} days remaining to reach funding goal`;
+        }
+        
+        async function fetchRecentStakes() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/stakes/project/${currentProjectId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateInvestorList(data.stakes.slice(0, 5));
+                }
+            } catch (error) {
+                console.error('Error fetching stakes:', error);
+            }
+        }
+        
+        function updateInvestorList(stakes) {
+            const container = document.getElementById('recentInvestors');
+            container.innerHTML = '';
+            
+            if (!stakes || stakes.length === 0) {
+                container.innerHTML = `
+                    <div class="investor-item">
+                        <span class="investor-address">No investments yet</span>
+                        <span class="investor-amount">Be the first!</span>
+                    </div>
+                `;
+                return;
+            }
+            
+            stakes.forEach(stake => {
+                const amountETH = Number(BigInt(stake.amount)) / 1e18;
+                const div = document.createElement('div');
+                div.className = 'investor-item';
+                div.innerHTML = `
+                    <span class="investor-address">${formatAddress(stake.staker)}</span>
+                    <span class="investor-amount">${amountETH.toFixed(2)} ETH</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        async function checkMilestoneStatus() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/check-milestone/${currentProjectId}`);
+                const data = await response.json();
+                
+                const milestoneStatus = document.getElementById('milestoneStatus');
+                if (data.success && data.milestone_reached) {
+                    milestoneStatus.style.display = 'block';
+                } else {
+                    milestoneStatus.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error checking milestone:', error);
+            }
+        }
+        
+        async function checkWalletConnection() {
+            const savedAddress = localStorage.getItem('greenfi_wallet_address');
+            
+            if (savedAddress && window.ethereum) {
+                try {
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    const accounts = await provider.send('eth_accounts', []);
+                    
+                    if (accounts.length > 0 && accounts[0].toLowerCase() === savedAddress.toLowerCase()) {
+                        walletAddress = savedAddress;
+                        signer = await provider.getSigner();
+                        await initializeContract();
+                        updateInvestmentButton(true);
+                        await loadWalletBalance();
+                    } else {
+                        updateInvestmentButton(false);
+                    }
+                } catch (error) {
+                    console.log('Wallet check failed:', error);
+                    updateInvestmentButton(false);
+                }
+            } else {
+                updateInvestmentButton(false);
+            }
+        }
+        
+        async function initializeContract() {
+            if (!signer || !CONTRACT_ADDRESS) return;
+            
+            try {
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                console.log('✅ Smart contract initialized');
+            } catch (error) {
+                console.error('❌ Failed to initialize contract:', error);
+            }
+        }
+        
+        async function loadWalletBalance() {
+            if (!provider || !walletAddress) return;
+            
+            try {
+                const balance = await provider.getBalance(walletAddress);
+                walletBalance = parseFloat(ethers.formatEther(balance));
+                document.getElementById('modalWalletBalance').textContent = `${walletBalance.toFixed(4)} ETH`;
+            } catch (error) {
+                console.error('Error loading wallet balance:', error);
+            }
+        }
+        
+        function updateInvestmentButton(isConnected) {
+            const investButton = document.getElementById('investButton');
+            
+            if (isConnected) {
+                investButton.disabled = false;
+                investButton.innerHTML = '<span>💰</span> Invest Now';
+                investButton.onclick = openInvestmentModal;
+            } else {
+                investButton.disabled = false;
+                investButton.innerHTML = '<span>🔗</span> Connect Wallet to Invest';
+                investButton.onclick = connectWallet;
+            }
+        }
+        
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                showStatus('Please install MetaMask to invest', 'error');
+                alert('MetaMask is not installed. Please install it to use GreenFi.');
+                return;
+            }
+            
+            try {
+                const connectButton = document.getElementById('investButton');
+                connectButton.disabled = true;
+                connectButton.innerHTML = '<span>⏳</span> Connecting...';
+                
+                const accounts = await window.ethereum.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+                
+                walletAddress = accounts[0];
+                localStorage.setItem('greenfi_wallet_address', walletAddress);
+                
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                await initializeContract();
+                
+                updateInvestmentButton(true);
+                await loadWalletBalance();
+                showStatus('✅ Wallet connected successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Connection error:', error);
+                showStatus('Failed to connect wallet: ' + error.message, 'error');
+                updateInvestmentButton(false);
+            }
+        }
+        
+        function openInvestmentModal() {
+            if (!projectData) return;
+            
+            const modal = document.getElementById('investmentModal');
+            const modalProjectName = document.getElementById('modalProjectName');
+            const modalCurrentFunding = document.getElementById('modalCurrentFunding');
+            const modalFundingGoal = document.getElementById('modalFundingGoal');
+            const modalAmount = document.getElementById('modalInvestmentAmount');
+            
+            // Calculate funding info
+            const fundsInWei = BigInt(projectData.funds || '0');
+            const goalInWei = BigInt(projectData.Funding_Goal || '1');
+            const fundsETH = Number(fundsInWei) / 1e18;
+            const goalETH = Number(goalInWei) / 1e18;
+            const percentage = goalETH > 0 ? (fundsETH / goalETH) * 100 : 0;
+            
+            // Update modal content
+            modalProjectName.textContent = projectData.name;
+            modalCurrentFunding.textContent = `${percentage.toFixed(1)}%`;
+            modalFundingGoal.textContent = `${goalETH.toFixed(2)} ETH`;
+            modalAmount.value = '1.0';
+            
+            // Update USD conversion
+            updateModalUSDConversion();
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Set focus on amount input
+            setTimeout(() => {
+                modalAmount.focus();
+            }, 100);
+        }
+        
+        function setupModal() {
+            const modal = document.getElementById('investmentModal');
+            const closeBtn = document.getElementById('closeModalBtn');
+            const cancelBtn = document.getElementById('cancelInvestBtn');
+            const confirmBtn = document.getElementById('confirmInvestBtn');
+            const amountInput = document.getElementById('modalInvestmentAmount');
+            const modalStatus = document.getElementById('modalStatus');
+            const quickAmounts = document.querySelectorAll('.modal-quick-amount');
+            
+            if (!modal || !closeBtn || !cancelBtn || !confirmBtn || !amountInput) {
+                console.warn('Modal elements not found');
+                return;
+            }
+            
+            // Close modal on close button click
+            closeBtn.addEventListener('click', closeInvestmentModal);
+            
+            // Close modal on cancel button click
+            cancelBtn.addEventListener('click', closeInvestmentModal);
+            
+            // Close modal on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeInvestmentModal();
+                }
+            });
+            
+            // Quick amount buttons
+            quickAmounts.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    quickAmounts.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    button.classList.add('active');
+                    
+                    // Set amount in input
+                    const amount = button.getAttribute('data-amount');
+                    amountInput.value = amount;
+                    updateModalUSDConversion();
+                });
+            });
+            
+            // Amount input change
+            amountInput.addEventListener('input', () => {
+                updateModalUSDConversion();
+                
+                // Remove active class from quick amount buttons
+                quickAmounts.forEach(btn => btn.classList.remove('active'));
+            });
+            
+            // Confirm investment
+            confirmBtn.addEventListener('click', async () => {
+                const amount = amountInput.value;
+                
+                if (!amount || parseFloat(amount) <= 0) {
+                    showStatus('Please enter a valid amount', 'error', 'modalStatus');
+                    return;
+                }
+                
+                const amountETH = parseFloat(amount);
+                
+                // Validation
+                if (amountETH < 0.1) {
+                    showStatus('Minimum investment is 0.1 ETH', 'error', 'modalStatus');
+                    return;
+                }
+                
+                if (amountETH > 100) {
+                    showStatus('Maximum investment is 100 ETH per transaction', 'error', 'modalStatus');
+                    return;
+                }
+                
+                if (amountETH > walletBalance) {
+                    showStatus('Insufficient balance in your wallet', 'error', 'modalStatus');
+                    return;
+                }
+                
+                if (!currentProjectId || !contract) {
+                    showStatus('Investment failed: No project selected or wallet not connected', 'error', 'modalStatus');
+                    return;
+                }
+                
+                try {
+                    confirmBtn.disabled = true;
+                    confirmBtn.innerHTML = '<div class="loading-spinner"></div> Processing...';
+                    showStatus('Processing investment... Please confirm transaction', 'info', 'modalStatus');
+                    
+                    // Convert project ID to NUMBER
+                    const projectId = parseInt(currentProjectId);
+                    if (isNaN(projectId)) {
+                        throw new Error(`Invalid project ID: ${currentProjectId}`);
+                    }
+                    
+                    const amountWei = ethers.parseEther(amountETH.toString());
+                    
+                    console.log('=== INVESTMENT START ===');
+                    console.log('Project ID (number):', projectId);
+                    console.log('Amount:', amountETH, 'ETH');
+                    console.log('Amount in Wei:', amountWei.toString());
+                    console.log('Wallet:', walletAddress);
+                    
+                    // Check if project exists in database
+                    console.log('🔍 Checking if project exists in database...');
+                    try {
+                        const projectCheck = await fetch(`${BACKEND_URL}/api/projects/${projectId}`);
+                        const projectData = await projectCheck.json();
+                        
+                        if (!projectData.success) {
+                            console.error('❌ Project not found in database!');
+                            throw new Error(`Project #${projectId} not found in database.`);
+                        }
+                        console.log('✅ Project found in database:', projectData.project.name);
+                    } catch (checkError) {
+                        console.error('Error checking project:', checkError);
+                        throw new Error('Cannot verify project in database.');
+                    }
+                    
+                    // Call contract stake function
+                    console.log('📝 Calling contract.stake()...');
+                    const tx = await contract.stake(projectId, { value: amountWei });
+                    showStatus(`Transaction sent: ${tx.hash.slice(0, 10)}...`, 'info', 'modalStatus');
+                    console.log('Transaction hash:', tx.hash);
+
+                    const receipt = await tx.wait();
+                    console.log('✅ Transaction confirmed in block:', receipt.blockNumber);
+                    
+                    // Prepare stake data for backend
+                    const stakeData = {
+                        project_id: projectId,
+                        staker: walletAddress.toLowerCase(),
+                        amount: amountWei.toString(),
+                        tx_hash: tx.hash,
+                        block_number: receipt.blockNumber
+                    };
+                    
+                    console.log('💾 Saving stake to backend:', JSON.stringify(stakeData, null, 2));
+                    
+                    // Save to database
+                    const saveResponse = await fetch(`${BACKEND_URL}/api/stakes`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(stakeData)
+                    });
+
+                    console.log('📥 Save response status:', saveResponse.status);
+                    
+                    let responseText;
+                    try {
+                        responseText = await saveResponse.text();
+                        console.log('Backend response text:', responseText);
+                    } catch (textError) {
+                        console.error('Error reading response text:', textError);
+                        responseText = 'Could not read response';
+                    }
+                    
+                    let responseData;
+                    try {
+                        responseData = JSON.parse(responseText);
+                        console.log('Parsed response data:', responseData);
+                    } catch (parseError) {
+                        console.error('Failed to parse response as JSON:', parseError);
+                        responseData = { 
+                            success: false, 
+                            error: `Invalid JSON response` 
+                        };
+                    }
+                    
+                    if (!saveResponse.ok) {
+                        let errorMsg = 'Unknown error';
+                        
+                        if (responseData && responseData.error) {
+                            errorMsg = responseData.error;
+                            
+                            if (errorMsg.includes('Missing required fields')) {
+                                console.error('❌ Backend validation error');
+                                errorMsg = `${errorMsg}. Check browser console for details.`;
+                            }
+                        } else {
+                            errorMsg = `HTTP ${saveResponse.status}`;
+                        }
+                        
+                        throw new Error(`Failed to save investment: ${errorMsg}`);
+                    }
+
+                    if (responseData && responseData.success !== false) {
+                        showStatus('✅ Investment successful!', 'success', 'modalStatus');
+                        console.log('🎉 Investment saved to database successfully!');
+                        
+                        // Update wallet balance
+                        await loadWalletBalance();
+                        
+                        // Close modal after delay
+                        setTimeout(async () => {
+                            closeInvestmentModal();
+                            
+                            // Refresh data
+                            await fetchProjectData();
+                        }, 2000);
+                    } else {
+                        const errorMsg = responseData?.error || 'Unknown database error';
+                        throw new Error(`Backend error: ${errorMsg}`);
+                    }
+
+                } catch (error) {
+                    console.error('❌ Investment error:', error);
+                    
+                    let errorMessage = error.message;
+                    
+                    if (error.code === 4001) {
+                        errorMessage = 'Transaction was rejected by MetaMask';
+                    } else if (error.code === -32603) {
+                        errorMessage = 'Transaction failed. Check contract execution.';
+                    } else if (error.reason) {
+                        errorMessage = error.reason;
+                    } else if (error.message.includes('insufficient funds')) {
+                        errorMessage = 'Insufficient ETH balance for this transaction';
+                    }
+                    
+                    showStatus(`❌ ${errorMessage}`, 'error', 'modalStatus');
+                } finally {
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = '<span>💰</span> Confirm Investment';
+                }
+            });
+            
+            function closeInvestmentModal() {
+                modal.style.display = 'none';
+                amountInput.value = '';
+                if (modalStatus) {
+                    modalStatus.style.display = 'none';
+                    modalStatus.className = 'modal-status';
+                }
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<span>💰</span> Confirm Investment';
+                
+                // Remove active class from quick amount buttons
+                quickAmounts.forEach(btn => btn.classList.remove('active'));
+            }
+        }
+        
+        function updateModalUSDConversion() {
+            const amountInput = document.getElementById('modalInvestmentAmount');
+            const amount = parseFloat(amountInput.value) || 0;
+            const usdAmount = amount * ethPrice;
+            document.getElementById('modalUsdAmount').textContent = usdAmount.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        function updateOwnerFeatures() {
+            if (!projectData || !walletAddress) return;
+            
+            const isOwner = walletAddress.toLowerCase() === projectData.owner.toLowerCase();
+            const ownerActions = document.getElementById('ownerActions');
+            const investButton = document.getElementById('investButton');
+            
+            if (isOwner) {
+                ownerActions.style.display = 'block';
+                
+                // Setup withdrawal button
+                const withdrawButton = document.getElementById('withdrawButton');
+                withdrawButton.onclick = handleWithdrawal;
+                
+                // Hide invest button for owner
+                investButton.style.display = 'none';
+            } else {
+                ownerActions.style.display = 'none';
+                investButton.style.display = 'block';
+            }
+        }
+        
+        async function handleWithdrawal() {
+            if (!projectData || !projectData.milestone_reached) {
+                showStatus('Milestone not reached yet', 'error');
+                return;
+            }
+            
+            if (!walletAddress || !contract) {
+                showStatus('Please connect your wallet', 'error');
+                return;
+            }
+            
+            try {
+                const withdrawButton = document.getElementById('withdrawButton');
+                withdrawButton.disabled = true;
+                withdrawButton.innerHTML = '<div class="loading-spinner"></div> Processing...';
+                
+                showStatus('Preparing withdrawal...', 'info');
+                
+                // Call contract withdraw function
+                const projectId = parseInt(currentProjectId);
+                const tx = await contract.withdraw(projectId);
+                showStatus(`Withdrawal sent: ${tx.hash.slice(0, 10)}...`, 'info');
+                
+                const receipt = await tx.wait();
+                
+                // Record withdrawal in backend
+                const withdrawalData = {
+                    project_id: projectId,
+                    withdrawer: walletAddress.toLowerCase(),
+                    amount: projectData.funds,
+                    milestone: true,
+                    tx_hash: tx.hash,
+                    block_number: receipt.blockNumber
+                };
+                
+                await fetch(`${BACKEND_URL}/api/withdrawals`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(withdrawalData)
+                });
+                
+                showStatus('✅ Withdrawal successful!', 'success');
+                
+                // Refresh data
+                setTimeout(async () => {
+                    await fetchProjectData();
+                    withdrawButton.disabled = false;
+                    withdrawButton.innerHTML = '<span>💸</span> Withdraw Funds';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Withdrawal error:', error);
+                showStatus('Withdrawal failed: ' + error.message, 'error');
+                document.getElementById('withdrawButton').disabled = false;
+                document.getElementById('withdrawButton').innerHTML = '<span>💸</span> Withdraw Funds';
+            }
+        }
+        
+        async function updateETHPrice() {
+            try {
+                ethPrice = 1800; // Fallback price
+                updateUSDConversion();
+                updateModalUSDConversion();
+            } catch (error) {
+                console.error('Failed to fetch ETH price:', error);
+            }
+        }
+        
+        function updateUSDConversion() {
+            const amountInput = document.getElementById('investmentAmount');
+            const amount = parseFloat(amountInput.value) || 0;
+            const usdAmount = amount * ethPrice;
+            document.getElementById('usdAmount').textContent = usdAmount.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        function updateEstimatedReturn() {
+            const amountInput = document.getElementById('investmentAmount');
+            const amount = parseFloat(amountInput.value) || 0;
+            const annualReturn = amount * 0.12;
+            document.getElementById('estimatedReturn').textContent = annualReturn.toFixed(3) + ' ETH';
+        }
+        
+        function setupEventListeners() {
+            // Investment amount input
+            const amountInput = document.getElementById('investmentAmount');
+            amountInput.addEventListener('input', () => {
+                updateUSDConversion();
+                updateEstimatedReturn();
+            });
+            
+            // Quick amount buttons
+            document.querySelectorAll('.quick-amount').forEach(button => {
+                button.addEventListener('click', () => {
+                    const amount = parseFloat(button.dataset.amount);
+                    amountInput.value = amount;
+                    updateUSDConversion();
+                    updateEstimatedReturn();
+                });
+            });
+            
+            // Listen for account changes
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', async (accounts) => {
+                    if (accounts.length === 0) {
+                        walletAddress = '';
+                        updateInvestmentButton(false);
+                        showStatus('Wallet disconnected', 'info');
+                        localStorage.removeItem('greenfi_wallet_address');
+                    } else {
+                        walletAddress = accounts[0];
+                        localStorage.setItem('greenfi_wallet_address', accounts[0]);
+                        await checkWalletConnection();
+                    }
+                });
+                
+                window.ethereum.on('chainChanged', () => {
+                    window.location.reload();
+                });
+            }
+        }
+        
+        function formatAddress(address) {
+            if (!address) return 'Unknown';
+            return `${address.slice(0, 6)}...${address.slice(-4)}`;
+        }
+        
+        function showStatus(message, type = 'info', elementId = 'investmentStatus') {
+            const statusElement = document.getElementById(elementId);
+            if (!statusElement) return;
+            
+            statusElement.textContent = message;
+            statusElement.className = type === 'modalStatus' ? 'modal-status' : 'status-message';
+            
+            if (type === 'success') {
+                statusElement.classList.add(type === 'modalStatus' ? 'success' : 'status-success');
+            } else if (type === 'error') {
+                statusElement.classList.add(type === 'modalStatus' ? 'error' : 'status-error');
+            } else if (type === 'info') {
+                if (type === 'modalStatus') {
+                    statusElement.classList.add('info');
+                } else {
+                    statusElement.style.background = 'rgba(255, 255, 255, 0.1)';
+                    statusElement.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+                    statusElement.style.color = '#ffffff';
+                }
+            }
+            
+            statusElement.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // Resize handler
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

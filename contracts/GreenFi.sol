@@ -14,7 +14,7 @@ contract GreenFi is ERC20, Ownable {
     mapping(uint256 => Project) public projects;
     uint256 public projectCount;
 
-    // ✅ Only call ERC20 constructor here
+    // Only call ERC20 constructor here
     constructor() ERC20("GreenToken", "GT") Ownable(msg.sender) {}
 
     // Investor stakes ETH → receives GreenTokens
@@ -33,7 +33,7 @@ contract GreenFi is ERC20, Ownable {
     }
 
     // Verifier marks milestone reached
-    function markMilestone(uint256 projectId) external onlyOwner {
+    function markMilestone(uint256 projectId) external {
         projects[projectId].milestoneReached = true;
     }
 

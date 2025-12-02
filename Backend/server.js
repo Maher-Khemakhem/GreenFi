@@ -11,10 +11,8 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
-
-// Serve frontend files from the frontend directory (one level up)
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // MySQL Connection Pool
 const pool = mysql.createPool({
@@ -26,6 +24,38 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0
 });
+
+// Helper function to check if milestone should be reached - ADDED
+async function checkAndUpdateMilestone(projectId) {
+  try {
+    // Get project details
+    const [projects] = await pool.query(
+      `SELECT funds, Funding_Goal, milestone_reached FROM projects WHERE id = ?`,
+      [projectId]
+    );
+    
+    if (projects.length > 0) {
+      const project = projects[0];
+      const currentFunds = BigInt(project.funds || '0');
+      const fundingGoal = BigInt(project.Funding_Goal || '0');
+      const milestoneReached = project.milestone_reached;
+      
+      // If funds >= funding_goal and milestone not already reached, update it
+      if (currentFunds >= fundingGoal && fundingGoal > 0 && !milestoneReached) {
+        await pool.query(
+          `UPDATE projects SET milestone_reached = TRUE WHERE id = ?`,
+          [projectId]
+        );
+        console.log(`✅ Milestone automatically reached for project ${projectId}!`);
+        return true;
+      }
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking milestone:', error);
+    return false;
+  }
+}
 
 // Test database connection
 async function testConnection() {
@@ -47,7 +77,7 @@ async function initDatabase() {
     const connection = await pool.getConnection();
     console.log('🔧 Initializing database tables...');
     
-    // Create projects table
+    // Create projects table - UPDATED to ensure Funding_Goal column exists
     await connection.query(`
       CREATE TABLE IF NOT EXISTS projects (
         id BIGINT PRIMARY KEY,
@@ -57,6 +87,7 @@ async function initDatabase() {
         funds VARCHAR(100) DEFAULT '0',
         milestone_reached BOOLEAN DEFAULT FALSE,
         tx_hash VARCHAR(66),
+        Funding_Goal VARCHAR(100) DEFAULT '0', -- Added DEFAULT value
         block_number BIGINT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -64,6 +95,15 @@ async function initDatabase() {
         INDEX idx_created (created_at)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
+    
+    // Check and add Funding_Goal column if it doesn't exist
+    try {
+      await connection.query('SELECT Funding_Goal FROM projects LIMIT 1');
+    } catch (error) {
+      console.log('Adding Funding_Goal column to projects table...');
+      await connection.query('ALTER TABLE projects ADD COLUMN Funding_Goal VARCHAR(100) DEFAULT "0"');
+    }
+    
     console.log('✅ Projects table ready');
 
     // Create stakes table
@@ -120,30 +160,93 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Create or update project
+// NEW: Check milestone status for a project
+app.get('/api/check-milestone/:projectId', async (req, res) => {
+  try {
+    const projectId = req.params.projectId;
+    
+    // Run the automatic milestone check
+    await checkAndUpdateMilestone(projectId);
+    
+    // Get the updated project status
+    const [projects] = await pool.query(
+      `SELECT milestone_reached, funds, Funding_Goal FROM projects WHERE id = ?`,
+      [projectId]
+    );
+    
+    if (projects.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Project not found' 
+      });
+    }
+    
+    const project = projects[0];
+    const currentFunds = BigInt(project.funds || '0');
+    const fundingGoal = BigInt(project.Funding_Goal || '0');
+    const progress = fundingGoal > 0 ? Number(currentFunds) / Number(fundingGoal) : 0;
+    
+    res.json({ 
+      success: true,
+      milestone_reached: project.milestone_reached,
+      current_funds: currentFunds.toString(),
+      funding_goal: fundingGoal.toString(),
+      progress: Math.min(progress * 100, 100)
+    });
+    
+  } catch (error) {
+    console.error('Error checking milestone:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Internal server error' 
+    });
+  }
+});
+
+// Create or update project - UPDATED to include Funding_Goal
 app.post('/api/projects', async (req, res) => {
   try {
-    const { id, owner, name, description, funds, milestone_reached, tx_hash, block_number } = req.body;
+    const { id, owner, name, description, funds, milestone_reached, tx_hash, block_number, funding_goal } = req.body;
 
     // Validation
-    if (!id || !owner || !name) {
+    if (id === undefined || !owner || !name) {
       return res.status(400).json({ 
         success: false, 
         error: 'Missing required fields: id, owner, name' 
       });
     }
 
-    console.log('📝 Saving project:', { id, owner: owner.slice(0, 6) + '...', name });
+    console.log('📝 Saving project:', { 
+      id, 
+      owner: owner.slice(0, 6) + '...', 
+      name,
+      funding_goal: funding_goal || '0'
+    });
 
     const [result] = await pool.query(
-      `INSERT INTO projects (id, owner, name, description, funds, milestone_reached, tx_hash, block_number)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO projects 
+        (id, owner, name, description, funds, milestone_reached, tx_hash, block_number, funding_goal)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
-       funds = VALUES(funds),
-       milestone_reached = VALUES(milestone_reached),
-       updated_at = CURRENT_TIMESTAMP`,
-      [id, owner.toLowerCase(), name, description || '', funds || '0', milestone_reached || false, tx_hash, block_number]
+         funds = VALUES(funds),
+         milestone_reached = VALUES(milestone_reached),
+         funding_goal = VALUES(funding_goal),
+         updated_at = CURRENT_TIMESTAMP`,
+      [
+        id, 
+        owner.toLowerCase(), 
+        name, 
+        description || '', 
+        funds || '0', 
+        milestone_reached ? 1 : 0, // store boolean as 1/0
+        tx_hash || null, 
+        block_number || null,
+        funding_goal || '0'
+      ]
     );
+
+    // Optionally check/update milestone after saving project
+    await checkAndUpdateMilestone(id);
 
     console.log('✅ Project saved successfully');
     res.json({ 
@@ -157,7 +260,7 @@ app.post('/api/projects', async (req, res) => {
   }
 });
 
-// Get all projects with aggregated data
+// Get all projects with aggregated data - UPDATED to include Funding_Goal
 app.get('/api/projects', async (req, res) => {
   try {
     const [projects] = await pool.query(
@@ -240,19 +343,22 @@ app.get('/api/projects/:id', async (req, res) => {
   }
 });
 
-// Record stake
+// Record stake - UPDATED to check milestone automatically
 app.post('/api/stakes', async (req, res) => {
   try {
+    console.log(req.body);
     const { project_id, staker, amount, tx_hash, block_number } = req.body;
-
+    
     // Validation
-    if (!project_id || !staker || !amount) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Missing required fields: project_id, staker, amount' 
-      });
-    }
+    if (project_id === undefined || project_id === null ||
+    !staker ||
+    !amount) {
 
+  return res.status(400).json({
+    success: false,
+    error: 'Missing required fields: project_id, staker, amount'
+  });
+}
     console.log('💰 Recording stake:', { 
       project_id, 
       staker: staker.slice(0, 6) + '...', 
@@ -283,6 +389,9 @@ app.post('/api/stakes', async (req, res) => {
       [project_id, project_id]
     );
 
+    // NEW: Check and update milestone after stake
+    await checkAndUpdateMilestone(project_id);
+
     console.log('✅ Stake recorded successfully');
     res.json({ success: true, message: 'Stake recorded successfully' });
   } catch (error) {
@@ -311,14 +420,15 @@ app.get('/api/stakes/project/:id', async (req, res) => {
   }
 });
 
-// Get stakes by user
+// Get stakes by user - UPDATED to include funding_goal
 app.get('/api/stakes/user/:address', async (req, res) => {
   try {
     const { address } = req.params;
     
     const [stakes] = await pool.query(
       `SELECT s.*, p.name as project_name, p.owner as project_owner,
-              p.milestone_reached as project_milestone_reached
+              p.milestone_reached as project_milestone_reached,
+              p.Funding_Goal as project_funding_goal
        FROM stakes s
        JOIN projects p ON s.project_id = p.id
        WHERE LOWER(s.staker) = LOWER(?)
@@ -337,10 +447,10 @@ app.get('/api/stakes/user/:address', async (req, res) => {
 // Record withdrawal
 app.post('/api/withdrawals', async (req, res) => {
   try {
-    const { project_id, withdrawer, amount, milestone_marked, tx_hash, block_number } = req.body;
+    const { project_id, withdrawer, amount,milestone, tx_hash, block_number } = req.body;
 
     // Validation
-    if (!project_id || !withdrawer || !amount) {
+    if (project_id==undefined || withdrawer==undefined || amount==undefined) {
       return res.status(400).json({ 
         success: false, 
         error: 'Missing required fields: project_id, withdrawer, amount' 
@@ -361,21 +471,21 @@ app.post('/api/withdrawals', async (req, res) => {
         error: 'Project not found' 
       });
     }
-
-    // Insert withdrawal
-    await pool.query(
-      `INSERT INTO withdrawals (project_id, withdrawer, amount, milestone_marked, tx_hash, block_number)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [project_id, withdrawer.toLowerCase(), amount, milestone_marked || false, tx_hash, block_number]
-    );
-
-    // Update project milestone status if marked
-    if (milestone_marked) {
+    if (milestone) {
       await pool.query(
         'UPDATE projects SET milestone_reached = TRUE WHERE id = ?',
         [project_id]
       );
     }
+    // Insert withdrawal
+    await pool.query(
+      `INSERT INTO withdrawals (project_id, withdrawer, amount, milestone_marked, tx_hash, block_number)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [project_id, withdrawer.toLowerCase(), amount, milestone || false, tx_hash, block_number]
+    );
+
+    // Update project milestone status if marked
+    
 
     console.log('✅ Withdrawal recorded successfully');
     res.json({ success: true, message: 'Withdrawal recorded successfully' });
@@ -427,7 +537,7 @@ app.get('/api/withdrawals/project/:id', async (req, res) => {
   }
 });
 
-// Get comprehensive statistics
+// Get comprehensive statistics - UPDATED with funding goal stats
 app.get('/api/stats', async (req, res) => {
   try {
     // Get basic stats
@@ -452,6 +562,11 @@ app.get('/api/stats', async (req, res) => {
       'SELECT COUNT(*) as count FROM projects WHERE milestone_reached = TRUE'
     );
 
+    // Get total funding goal
+    const [totalGoal] = await pool.query(
+      'SELECT COALESCE(SUM(CAST(Funding_Goal AS DECIMAL(65,0))), 0) as total FROM projects'
+    );
+
     res.json({
       success: true,
       stats: {
@@ -460,6 +575,9 @@ app.get('/api/stats', async (req, res) => {
         completedProjects: completedProjects[0].count,
         totalStakes: stakeCount[0].count,
         totalFundsRaised: totalFunds[0].total,
+        totalFundingGoal: totalGoal[0].total,
+        fundingProgress: totalGoal[0].total > 0 ? 
+          (Number(BigInt(totalFunds[0].total || 0)) / Number(BigInt(totalGoal[0].total || 1)) * 100).toFixed(2) : 0,
         totalWithdrawals: withdrawalCount[0].count,
         totalWithdrawn: totalWithdrawn[0].total,
         netFunds: (BigInt(totalFunds[0].total || 0) - BigInt(totalWithdrawn[0].total || 0)).toString(),
@@ -665,6 +783,7 @@ async function startServer() {
     console.log('');
     console.log('📍 Available endpoints:');
     console.log('   GET  /api/health');
+    console.log('   GET  /api/check-milestone/:projectId'); // NEW ENDPOINT
     console.log('   GET  /api/projects');
     console.log('   POST /api/projects');
     console.log('   GET  /api/projects/:id');
